@@ -12,6 +12,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY api ./api
 COPY pytest.ini .
+COPY samples ./samples
 COPY --from=frontend /frontend/dist ./frontend/dist
 
 ENV PYTHONUNBUFFERED=1

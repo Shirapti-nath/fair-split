@@ -95,7 +95,7 @@ export default function App() {
             onChange={(e) => setFile(e.target.files?.[0] ?? null)}
           />
           <p style={{ fontSize: "0.85rem", color: "#666", marginTop: "0.35rem" }}>
-            Or test without OCR:{" "}
+            Demo mode (no API key): upload a sample receipt or use{" "}
             {(["R1", "R2", "R3", "R4"] as const).map((id) => (
               <button
                 key={id}

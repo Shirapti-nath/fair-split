@@ -8,6 +8,7 @@ from api.schemas import BillExtraction, SplitIntent, SplitResponse
 from api.services.calculator import compute_per_person, reconcile_grand_total
 from api.services.fixtures import FIXTURES
 from api.services.matcher import match_intent_to_bill
+from api.services.offline import detect_fixture, is_offline_mode
 from api.services.settle_up import build_settle_up
 from api.services.validator import build_reconciliation, validate_bill, validate_matched
 
@@ -35,6 +36,28 @@ async def run_split(
     if fixture:
         bill, intent = fixture
         assumptions.append(f"Using built-in fixture {description.strip()}")
+    elif is_offline_mode():
+        if not receipt_base64 and not description.strip():
+            flags.append("No receipt image or description provided")
+            return _empty_response(flags, assumptions)
+        key = detect_fixture(receipt_base64, description)
+        if not key:
+            flags.append(
+                "Could not match to a sample receipt (R1–R4). "
+                "Click an R1–R4 button, upload a sample from samples/, or use a matching description."
+            )
+            return _empty_response(flags, assumptions)
+        bill, intent, label = FIXTURES[key]
+        bill = bill.model_copy(deep=True)
+        intent = intent.model_copy(deep=True)
+        assumptions.append("Running in offline demo mode (no Anthropic API key)")
+        from api.services.offline import detect_fixture_from_image
+
+        if receipt_base64 and detect_fixture_from_image(receipt_base64):
+            assumptions.append(f"Matched uploaded image to sample receipt {key} ({label})")
+        else:
+            assumptions.append(f"Inferred sample bill {key} ({label}) from description")
+        assumptions.append(f"Using built-in split rules for sample {key}")
     else:
         if not receipt_base64:
             flags.append("No receipt image provided")

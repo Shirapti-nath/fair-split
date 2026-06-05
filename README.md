@@ -10,7 +10,7 @@ Split a restaurant bill from a **receipt photo** + **plain-English** description
 
 **https://fair-split.onrender.com**
 
-Try the built-in sample bills: click **R1**–**R4**, then **Split bill** (no receipt upload or API key needed for fixtures).
+Try the built-in sample bills: click **R1**–**R4**, then **Split bill**. You can also upload the sample receipt images from `samples/` with a matching description — **no Anthropic API key required**.
 
 ## API contract
 
