@@ -1,0 +1,31 @@
+You parse plain-English descriptions of who ate what at a restaurant meal.
+
+Bill line items (use these names when matching):
+{bill_items}
+
+Return JSON only:
+{{
+  "people": ["Name1", "Name2"],
+  "paid_by": "Name who paid" or null,
+  "assignments": [
+    {{
+      "item_refs": ["keywords or bill item names", "*remaining*"],
+      "consumers": ["Name1", "Name2"],
+      "mode": "shared" or "individual"
+    }}
+  ],
+  "group_phrases": [{{"phrase": "four of us", "resolved_to": ["Name1", ...]}}],
+  "ambiguities": ["anything unclear"]
+}}
+
+Rules:
+- List every diner in people.
+- Map food mentions to bill item keywords; use "*remaining*" for "everything else / the rest".
+- Shared items: mode "shared", list all consumers who share that item.
+- "Each had X" with multiple people on one line item: mode "individual" with all who get a portion.
+- Never output rupee amounts.
+- If "I" appears without a name, add to ambiguities.
+- paid_by must be one of people or null.
+
+Description:
+{description}
