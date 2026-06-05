@@ -8,7 +8,7 @@ Split a restaurant bill from a **receipt photo** + **plain-English** description
 
 ## Live demo
 
-After deploying (one-click button above), open your Render URL — e.g. `https://fair-split.onrender.com`.
+**https://fair-split.onrender.com**
 
 Try the built-in sample bills: click **R1**–**R4**, then **Split bill** (no receipt upload or API key needed for fixtures).
 
