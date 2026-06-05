@@ -2,14 +2,15 @@
 
 Split a restaurant bill from a **receipt photo** + **plain-English** description of who had what. Returns per-person totals (tax, service, discount), reconciliation, and settle-up.
 
+**GitHub:** https://github.com/Shirapti-nath/fair-split
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Shirapti-nath/fair-split)
+
 ## Live demo
 
-| Service | URL |
-|---------|-----|
-| App | _see repo homepage after deploy_ |
-| API health | _your-deploy-url_/health |
+After deploying (one-click button above), open your Render URL — e.g. `https://fair-split.onrender.com`.
 
-Try the built-in sample bills: click **R1**–**R4**, then **Split bill** (no receipt upload or API key needed).
+Try the built-in sample bills: click **R1**–**R4**, then **Split bill** (no receipt upload or API key needed for fixtures).
 
 ## API contract
 

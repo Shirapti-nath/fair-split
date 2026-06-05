@@ -4,5 +4,6 @@ __pycache__/
 .env
 node_modules/
 frontend/dist/
+frontend/tsconfig.tsbuildinfo
 .DS_Store
 TEST_OUTPUT.txt
