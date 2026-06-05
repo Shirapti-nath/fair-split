@@ -53,9 +53,13 @@ def _to_intent(data: dict) -> SplitIntent:
 
 
 async def parse_description(description: str, bill: BillExtraction) -> SplitIntent:
-    api_key = os.getenv("ANTHROPIC_API_KEY")
-    if not api_key:
-        raise RuntimeError("ANTHROPIC_API_KEY is not set")
+    from api.services.offline import has_valid_api_key
+
+    if not has_valid_api_key():
+        raise RuntimeError(
+            "No valid Anthropic API key. Use sample receipts R1–R4 or click the R1–R4 demo buttons."
+        )
+    api_key = os.getenv("ANTHROPIC_API_KEY", "").strip()
 
     client = Anthropic(api_key=api_key)
     prompt = _load_prompt(description, bill)

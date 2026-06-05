@@ -33,7 +33,13 @@ STATIC_DIR = Path(__file__).resolve().parent.parent / "frontend" / "dist"
 
 @app.get("/health")
 def health() -> dict[str, str]:
-    return {"status": "ok"}
+    from api.services.offline import has_valid_api_key
+
+    return {
+        "status": "ok",
+        "mode": "online" if has_valid_api_key() else "offline-demo",
+        "version": "2",
+    }
 
 
 if STATIC_DIR.is_dir():

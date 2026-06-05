@@ -14,8 +14,13 @@ SAMPLES_DIR = Path(__file__).resolve().parents[2] / "samples"
 IMAGE_MATCH_THRESHOLD = 0.82
 
 
+def has_valid_api_key() -> bool:
+    key = (os.getenv("ANTHROPIC_API_KEY") or "").strip()
+    return key.startswith("sk-ant-") and len(key) > 20
+
+
 def is_offline_mode() -> bool:
-    return not os.getenv("ANTHROPIC_API_KEY")
+    return not has_valid_api_key()
 
 
 def _decode_image(b64: str):

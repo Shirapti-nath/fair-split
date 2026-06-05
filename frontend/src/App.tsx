@@ -24,6 +24,13 @@ type SplitResult = {
   flags: string[];
 };
 
+const FIXTURE_DESCRIPTIONS: Record<string, string> = {
+  R1: "Three of us — Ravi, Neha, Sameer. Ravi had the cappuccino and the sandwich. Neha had the pasta and the lime soda. Sameer had the brownie. Sameer paid.",
+  R2: "Four of us — Aman, Priya, Karan, Sara. Priya and Karan shared the gulab jamun. Everything else split equally among all four. Priya paid.",
+  R3: "Three of us — Ishaan, Meera, Rohit. Pizza, pasta, and garlic bread were shared by all three. Ishaan and Rohit shared the craft beer. Meera had the virgin mojito. Rohit paid.",
+  R4: "Four of us — Dev, Nikhil, Anjali, Farah. Dev and Nikhil each had chicken biryani. Anjali had veg biryani. Farah had mutton rogan josh. Raita and soft drinks were common to all four. Anjali paid.",
+};
+
 function fileToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -37,11 +44,16 @@ function fileToBase64(file: File): Promise<string> {
   });
 }
 
+function sampleIdFromFile(file: File | null): string | null {
+  if (!file) return null;
+  const match = file.name.match(/R([1-4])\.png$/i);
+  return match ? `R${match[1]}` : null;
+}
+
 export default function App() {
-  const [description, setDescription] = useState(
-    "Three of us — Ravi, Neha, Sameer. Ravi had the cappuccino and the sandwich. Neha had the pasta and the lime soda. Sameer had the brownie. Sameer paid."
-  );
+  const [description, setDescription] = useState(FIXTURE_DESCRIPTIONS.R1);
   const [file, setFile] = useState<File | null>(null);
+  const [sampleFixture, setSampleFixture] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<SplitResult | null>(null);
@@ -52,13 +64,18 @@ export default function App() {
     setError(null);
     setResult(null);
     try {
+      const uploadedSample = sampleIdFromFile(file);
+      const fixtureId = sampleFixture ?? uploadedSample;
       const receipt_base64 = file ? await fileToBase64(file) : "";
+      const effectiveDescription = fixtureId
+        ? `fixture:${fixtureId}`
+        : description;
       const base = API_URL.replace(/\/$/, "");
       const url = base ? `${base}/split` : "/split";
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ receipt_base64, description }),
+        body: JSON.stringify({ receipt_base64, description: effectiveDescription }),
       });
       if (!res.ok) {
         const text = await res.text();
@@ -74,8 +91,18 @@ export default function App() {
   }
 
   function loadFixture(id: string) {
-    setDescription(`fixture:${id}`);
+    setDescription(FIXTURE_DESCRIPTIONS[id] ?? "");
+    setSampleFixture(id);
     setFile(null);
+  }
+
+  function handleFileChange(selected: File | null) {
+    setFile(selected);
+    const uploadedSample = sampleIdFromFile(selected);
+    if (uploadedSample) {
+      setSampleFixture(uploadedSample);
+      setDescription(FIXTURE_DESCRIPTIONS[uploadedSample] ?? description);
+    }
   }
 
   return (
@@ -92,10 +119,15 @@ export default function App() {
             id="receipt"
             type="file"
             accept="image/*"
-            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+            onChange={(e) => handleFileChange(e.target.files?.[0] ?? null)}
           />
+          {sampleFixture && (
+            <p style={{ fontSize: "0.85rem", color: "#166534", marginTop: "0.35rem" }}>
+              Sample receipt {sampleFixture} detected — no API key needed.
+            </p>
+          )}
           <p style={{ fontSize: "0.85rem", color: "#666", marginTop: "0.35rem" }}>
-            Demo mode (no API key): upload a sample receipt or use{" "}
+            Or pick a demo bill:{" "}
             {(["R1", "R2", "R3", "R4"] as const).map((id) => (
               <button
                 key={id}
@@ -120,7 +152,10 @@ export default function App() {
           <textarea
             id="desc"
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={(e) => {
+              setDescription(e.target.value);
+              setSampleFixture(null);
+            }}
             required
           />
         </div>
